@@ -1,0 +1,15 @@
+{
+  "name": "pomodoro-timer-cli",
+  "version": "1.0.0",
+  "description": "Zero-dependency terminal Pomodoro timer with ASCII progress bars, pause/resume, and session tracking",
+  "main": "index.js",
+  "bin": {
+    "pomodoro": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js --work 25 --break 5"
+  },
+  "keywords": ["pomodoro", "timer", "cli", "terminal", "productivity"],
+  "author": "",
+  "license": "MIT"
+}
