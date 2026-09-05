@@ -1,24 +1,21 @@
 # pomodoro-timer-cli
 
-A minimal, zero-dependency interactive Pomodoro timer for your terminal featuring real-time ASCII progress bars, pause/resume, and customizable cycle tracking.
+A minimal, zero-dependency interactive Pomodoro timer for terminal and browser featuring real-time progress indicators, pause/resume, customizable intervals, and audio alerts.
 
 ## What it does
 
-Runs standard or customized Pomodoro productivity intervals directly in the terminal, automatically cycling between focus periods, short breaks, and long breaks with live progress bars and audio bell notifications.
+Runs Pomodoro productivity intervals directly in your terminal or via a sleek, responsive browser UI. Cycles between focus periods, short breaks, and long breaks with progress animations and chime notifications.
 
 ## Features
 
-- **Zero dependencies**: Pure Node.js standard library.
-- **Interactive controls**:
-  - `[Space]` — Pause / Resume
-  - `[s]` — Skip current phase
-  - `[q]` — Quit and show summary
-- **Dynamic ASCII progress bar**: Displays elapsed percentages and remaining time.
-- **Configurable intervals**: Customize work duration, break duration, long break duration, and cycles.
+- **Interactive Web App**: Responsive circular progress ring, customizable timers, cycle counters, and Web Audio chimes.
+- **Zero dependencies**: Pure Node.js and vanilla HTML5/CSS3.
+- **Terminal CLI Mode**: Dynamic ASCII progress bar with hotkeys (`[Space]`, `[s]`, `[q]`).
+- **Configurable durations**: Adjust work, short break, and long break intervals on the fly.
 
 ## Setup
 
-Requires Node.js (v14+). No dependencies to install.
+Requires Node.js (v14+). No external packages.
 
 ```bash
 cd pomodoro-timer-cli
@@ -26,24 +23,24 @@ cd pomodoro-timer-cli
 
 ## Run command
 
+### Launch Web UI
 ```bash
-node index.js
+node index.js --web
+# Open http://localhost:3000
 ```
+*(Or simply open `index.html` in your browser)*
 
-Or start with custom durations:
+### Terminal CLI
 ```bash
-node index.js --work 50 --break 10 --cycles 4
+node index.js --work 25 --break 5 --cycles 4
 ```
 
 ## Example usage
 
 ```bash
-# Start standard 25m work / 5m break session
-node index.js
+# Launch web dashboard on port 8080
+node index.js --web 8080
 
-# Start 45m work, 15m short break, 30m long break every 3 cycles
-node index.js -w 45 -b 15 -l 30 -c 3
-
-# View help
-node index.js --help
+# 50m work, 10m break in CLI
+node index.js -w 50 -b 10 -l 20 -c 4
 ```

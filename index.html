@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pomodoro Flow Studio</title>
+  <style>
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --bg: #090d16;
+      --bg-card: rgba(18, 26, 44, 0.75);
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background: radial-gradient(circle at 50% 15%, #1e1b4b 0%, var(--bg) 75%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 36px 32px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      backdrop-filter: blur(16px);
+      text-align: center;
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      letter-spacing: 0.05em;
+    }
+    .phase-pill {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 24px;
+      transition: color 0.3s ease;
+    }
+    .phase-work { color: #60a5fa; }
+    .phase-break { color: #34d399; }
+    .phase-long { color: #fbbf24; }
+
+    .timer-circle {
+      position: relative;
+      width: 240px;
+      height: 240px;
+      margin: 0 auto 28px;
+    }
+    .timer-circle svg {
+      transform: rotate(-90deg);
+      width: 240px;
+      height: 240px;
+    }
+    .circle-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.08);
+      stroke-width: 10;
+    }
+    .circle-progress {
+      fill: none;
+      stroke: var(--primary);
+      stroke-width: 10;
+      stroke-linecap: round;
+      stroke-dasharray: 691;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 0.5s ease, stroke 0.3s ease;
+    }
+    .timer-display {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .timer-time {
+      font-family: var(--font-mono);
+      font-size: 3.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .timer-cycle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    button {
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    button:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+    }
+    button.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+    }
+    button.primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .settings {
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .setting-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .setting-item label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .setting-item input {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      padding: 6px 10px;
+      text-align: center;
+      outline: none;
+    }
+    .setting-item input:focus {
+      border-color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-badge">🍅 FOCUS TIMER</div>
+    <div class="phase-pill phase-work" id="phaseLabel">💼 DEEP WORK</div>
+
+    <div class="timer-circle">
+      <svg>
+        <circle class="circle-bg" cx="120" cy="120" r="110"></circle>
+        <circle class="circle-progress" id="progressRing" cx="120" cy="120" r="110"></circle>
+      </svg>
+      <div class="timer-display">
+        <div class="timer-time" id="timeDisplay">25:00</div>
+        <div class="timer-cycle" id="cycleDisplay">Cycle 1 of 4</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="primary" id="startBtn">▶ Start</button>
+      <button id="skipBtn">⏭ Skip</button>
+      <button id="resetBtn">🔄 Reset</button>
+    </div>
+
+    <div class="settings">
+      <div class="setting-item">
+        <label>Work (min)</label>
+        <input type="number" id="workInput" value="25" min="1" max="120">
+      </div>
+      <div class="setting-item">
+        <label>Break (min)</label>
+        <input type="number" id="breakInput" value="5" min="1" max="60">
+      </div>
+      <div class="setting-item">
+        <label>Long (min)</label>
+        <input type="number" id="longInput" value="15" min="1" max="60">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CIRCUMFERENCE = 2 * Math.PI * 110; // ~691
+    let workMin = 25;
+    let breakMin = 5;
+    let longMin = 15;
+    const maxCycles = 4;
+
+    let currentPhase = 'WORK'; // WORK, BREAK, LONG
+    let currentCycle = 1;
+    let totalSeconds = workMin * 60;
+    let remainingSeconds = totalSeconds;
+    let isRunning = false;
+    let timerInterval = null;
+
+    const timeDisplay = document.getElementById('timeDisplay');
+    const phaseLabel = document.getElementById('phaseLabel');
+    const cycleDisplay = document.getElementById('cycleDisplay');
+    const progressRing = document.getElementById('progressRing');
+    const startBtn = document.getElementById('startBtn');
+    const skipBtn = document.getElementById('skipBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    const workInput = document.getElementById('workInput');
+    const breakInput = document.getElementById('breakInput');
+    const longInput = document.getElementById('longInput');
+
+    function playBeep() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.15); // A5
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.5);
+      } catch (e) {}
+    }
+
+    function formatTime(secs) {
+      const m = Math.floor(secs / 60);
+      const s = secs % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function render() {
+      timeDisplay.textContent = formatTime(remainingSeconds);
+      document.title = `${formatTime(remainingSeconds)} - ${currentPhase === 'WORK' ? 'Work' : 'Break'} | Pomodoro`;
+
+      const fraction = remainingSeconds / totalSeconds;
+      const offset = CIRCUMFERENCE * (1 - fraction);
+      progressRing.style.strokeDashoffset = offset;
+
+      if (currentPhase === 'WORK') {
+        phaseLabel.textContent = '💼 DEEP WORK';
+        phaseLabel.className = 'phase-pill phase-work';
+        progressRing.style.stroke = '#3b82f6';
+      } else if (currentPhase === 'BREAK') {
+        phaseLabel.textContent = '☕ SHORT BREAK';
+        phaseLabel.className = 'phase-pill phase-break';
+        progressRing.style.stroke = '#10b981';
+      } else {
+        phaseLabel.textContent = '🌴 LONG BREAK';
+        phaseLabel.className = 'phase-pill phase-long';
+        progressRing.style.stroke = '#f59e0b';
+      }
+
+      cycleDisplay.textContent = `Cycle ${currentCycle} of ${maxCycles}`;
+    }
+
+    function setPhase(phase) {
+      currentPhase = phase;
+      if (phase === 'WORK') totalSeconds = workMin * 60;
+      else if (phase === 'BREAK') totalSeconds = breakMin * 60;
+      else totalSeconds = longMin * 60;
+      remainingSeconds = totalSeconds;
+      render();
+    }
+
+    function nextPhase() {
+      playBeep();
+      if (currentPhase === 'WORK') {
+        if (currentCycle % maxCycles === 0) setPhase('LONG');
+        else setPhase('BREAK');
+      } else {
+        if (currentPhase === 'LONG') currentCycle = 1;
+        else currentCycle++;
+        setPhase('WORK');
+      }
+    }
+
+    function toggleTimer() {
+      if (isRunning) {
+        clearInterval(timerInterval);
+        isRunning = false;
+        startBtn.textContent = '▶ Resume';
+        startBtn.classList.remove('primary');
+      } else {
+        isRunning = true;
+        startBtn.textContent = '⏸ Pause';
+        startBtn.classList.add('primary');
+        timerInterval = setInterval(() => {
+          if (remainingSeconds > 0) {
+            remainingSeconds--;
+            render();
+          } else {
+            nextPhase();
+          }
+        }, 1000);
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      isRunning = false;
+      startBtn.textContent = '▶ Start';
+      startBtn.classList.add('primary');
+      setPhase('WORK');
+    }
+
+    startBtn.addEventListener('click', toggleTimer);
+    skipBtn.addEventListener('click', () => { nextPhase(); if (!isRunning) toggleTimer(); });
+    resetBtn.addEventListener('click', resetTimer);
+
+    workInput.addEventListener('change', (e) => { workMin = Math.max(1, parseInt(e.target.value) || 25); if (!isRunning && currentPhase === 'WORK') setPhase('WORK'); });
+    breakInput.addEventListener('change', (e) => { breakMin = Math.max(1, parseInt(e.target.value) || 5); if (!isRunning && currentPhase === 'BREAK') setPhase('BREAK'); });
+    longInput.addEventListener('change', (e) => { longMin = Math.max(1, parseInt(e.target.value) || 15); if (!isRunning && currentPhase === 'LONG') setPhase('LONG'); });
+
+    render();
+  </script>
+</body>
+</html>

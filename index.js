@@ -215,7 +215,36 @@ class PomodoroTimer {
   }
 }
 
+function startWebServer(port = 3000) {
+  const http = require('http');
+  const fs = require('fs');
+  const path = require('path');
+  const htmlPath = path.join(__dirname, 'index.html');
+
+  const server = http.createServer((req, res) => {
+    if (fs.existsSync(htmlPath)) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(fs.readFileSync(htmlPath));
+    } else {
+      res.writeHead(404);
+      res.end('Web UI not found');
+    }
+  });
+
+  server.listen(port, () => {
+    console.log(`Pomodoro Timer Web UI running at http://localhost:${port}`);
+  });
+}
+
 function main() {
+  const args = process.argv.slice(2);
+  if (args.includes('--web')) {
+    const portIndex = args.indexOf('--web');
+    const port = parseInt(args[portIndex + 1], 10) || 3000;
+    startWebServer(port);
+    return;
+  }
+
   const options = parseArgs();
   if (options.help) {
     showHelp();
