@@ -1,6 +1,14 @@
 # pomodoro-timer-cli
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-pomodoro.satyamsethi.dpdns.org-3b82f6?style=for-the-badge&logo=cloudflare&logoColor=white)](https://pomodoro.satyamsethi.dpdns.org)
+[![Cloudflare Pages](https://img.shields.io/badge/Cloudflare_Pages-Deployment-F38020?style=for-the-badge&logo=cloudflarepages&logoColor=white)](https://pomodoro-timer-cli.pages.dev)
+
 A minimal, zero-dependency interactive Pomodoro timer for terminal and browser featuring real-time progress indicators, pause/resume, customizable intervals, and audio alerts.
+
+## 🌐 Live Demo
+
+- **Primary Custom Domain**: [https://pomodoro.satyamsethi.dpdns.org](https://pomodoro.satyamsethi.dpdns.org)
+- **Cloudflare Pages Direct**: [https://pomodoro-timer-cli.pages.dev](https://pomodoro-timer-cli.pages.dev)
 
 ## What it does
 
